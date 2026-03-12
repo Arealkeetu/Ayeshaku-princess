@@ -1,43 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Our Memories Gallery</title>
+  <title>Our Memories</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
   <style>
-    body {
+    body{
       margin:0;
       font-family:'Poppins',sans-serif;
       text-align:center;
       background:linear-gradient(120deg,#ff758c,#ff7eb3);
       color:white;
-      /* space for fixed navbar */
-      padding-top: 70px;
     }
 
-    h1 {
+    h1{
       font-family:'Great Vibes',cursive;
       font-size:60px;
-      margin-top:20px;
-    }
-
-    /* Navbar */
-    .navbar{
-      position: fixed;   /* fixed on top */
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(0,0,0,0.3);
-      padding: 15px;
-      z-index: 1000;     /* above everything */
-    }
-    .navbar a{
-      color:white;
-      margin:15px;
-      text-decoration:none;
-      font-weight:600;
-      font-size:18px;
+      margin-top:30px;
     }
 
     /* upload box */
@@ -45,7 +25,7 @@
       border:2px dashed white;
       border-radius:20px;
       padding:35px;
-      margin:30px auto;
+      margin:20px auto;
       width:80%;
       max-width:500px;
       cursor:pointer;
@@ -58,25 +38,25 @@
       display:none;
     }
 
-    /* scrollable gallery container */
+    /* fixed gallery container */
     .gallery-container {
       max-width: 900px;
-      height: 500px; /* fixed height, scrollable */
+      height: 600px;
       margin: 20px auto;
       padding: 15px;
       border-radius: 20px;
       background: rgba(255,255,255,0.1);
-      overflow-y: auto;
+      overflow-y: auto; 
     }
 
-    /* gallery grid */
+    /* fixed grid */
     .gallery {
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      grid-template-columns: repeat(4, 1fr); /* 4 fixed columns */
       gap:15px;
     }
 
-    .gallery img {
+    .gallery img{
       width:100%;
       aspect-ratio:1/1;
       object-fit:cover;
@@ -85,13 +65,13 @@
       transition:transform 0.3s, box-shadow 0.3s;
     }
 
-    .gallery img:hover {
+    .gallery img:hover{
       transform:scale(1.08);
       box-shadow:0 10px 20px rgba(0,0,0,0.4);
     }
 
     /* popup */
-    #popup {
+    #popup{
       display:none;
       position:fixed;
       top:0;
@@ -104,7 +84,7 @@
       z-index:999;
     }
 
-    #popup img {
+    #popup img{
       max-width:80%;
       max-height:80%;
       border-radius:20px;
@@ -116,13 +96,6 @@
 <body>
 
 <h1>Our Memories 📸</h1>
-
-<div class="navbar">
-  <a href="index.html">Home</a>
-  <a href="gallery.html">Gallery</a>
-  <a href="letter.html">Love Letter</a>
-  <a href="question.html">Question</a>
-</div>
 
 <label class="upload-box">
   Drop Photo Here or Click to Upload
@@ -139,8 +112,8 @@
 </div>
 
 <script>
-const cloudName = "dxyl0aoi0"; // your Cloudinary cloud name
-const preset = "gallery_upload"; // your unsigned upload preset
+const cloudName = "dxyl0aoi0"; // Cloudinary cloud name
+const preset = "gallery_upload"; // Unsigned upload preset
 const dropArea = document.querySelector(".upload-box");
 
 /* Click upload */
@@ -172,7 +145,7 @@ dropArea.addEventListener("drop",(e)=>{
   uploadImage(file);
 });
 
-/* Upload image to Cloudinary and save via Vercel API */
+/* Upload image to Cloudinary and save to server */
 async function uploadImage(file){
   if(!file){
     file = document.getElementById("fileInput").files[0];
@@ -182,6 +155,7 @@ async function uploadImage(file){
     return;
   }
 
+  // Upload to Cloudinary
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", preset);
@@ -192,32 +166,31 @@ async function uploadImage(file){
   });
 
   const data = await res.json();
-
   if(data.secure_url){
-    // Save to JSON via Vercel API
+    addImage(data.secure_url);
+
+    // Save URL to server
     await fetch('/api/addImage', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
       body: JSON.stringify({url: data.secure_url})
     });
-
-    displayImage(data.secure_url);
   }
 }
 
-/* Display image in gallery */
-function displayImage(url){
+/* Load saved gallery */
+async function loadGallery(){
+  const res = await fetch('/api/loadGallery');
+  const gallery = await res.json();
+  gallery.forEach(url => addImage(url));
+}
+
+/* Add image to gallery */
+function addImage(url){
   const img = document.createElement("img");
   img.src = url;
   img.onclick = ()=>openImage(url);
   document.getElementById("gallery").appendChild(img);
-}
-
-/* Load gallery from API */
-async function loadGallery(){
-  const res = await fetch('/api/loadGallery');
-  const urls = await res.json();
-  urls.forEach(url => displayImage(url));
 }
 
 /* Popup functions */
@@ -229,7 +202,7 @@ function closeImage(){
   document.getElementById("popup").style.display="none";
 }
 
-// Load images on page load
+/* Load gallery on page load */
 loadGallery();
 </script>
 
