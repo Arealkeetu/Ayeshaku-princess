@@ -13,6 +13,7 @@
       background:linear-gradient(120deg,#ff758c,#ff7eb3);
       color:white;
     }
+
     h1 {
       font-family:'Great Vibes',cursive;
       font-size:60px;
@@ -40,7 +41,7 @@
     /* scrollable gallery container */
     .gallery-container {
       max-width: 900px;
-      height: 500px; /* fixed height, scrollable */
+      height: 500px; /* fixed height */
       margin: 20px auto;
       padding: 15px;
       border-radius: 20px;
@@ -88,7 +89,6 @@
       max-height:80%;
       border-radius:20px;
     }
-
   </style>
 </head>
 
@@ -96,9 +96,9 @@
 
 <h1>Our Memories 📸</h1>
 
-<label class="upload-box">
+<label class="upload-box" id="dropArea">
   Drop Photo Here or Click to Upload
-  <input type="file" id="fileInput" accept="image/*">
+  <input type="file" id="fileInput" accept="image/*" multiple>
 </label>
 
 <div class="gallery-container">
@@ -111,61 +111,92 @@
 </div>
 
 <script>
-const cloudName = "dxyl0aoi0";
-const preset = "gallery_upload"; // unsigned upload preset
-const dropArea = document.querySelector(".upload-box");
+const cloudName = "dxyl0aoi0"; // your Cloudinary cloud name
+const preset = "gallery_upload"; // your unsigned upload preset
+const dropArea = document.getElementById("dropArea");
 
-// Load gallery on page load
-async function loadGallery() {
-  const res = await fetch("/api/loadGallery");
-  const data = await res.json();
-  if (data.images) data.images.forEach(url => addImage(url));
-}
-window.onload = loadGallery;
-
-// Upload logic
-dropArea.addEventListener("click", ()=> document.getElementById("fileInput").click());
-
-document.getElementById("fileInput").addEventListener("change", ()=> uploadImage());
-
-dropArea.addEventListener("dragover",(e)=> { e.preventDefault(); dropArea.style.background="rgba(255,255,255,0.2)"; });
-dropArea.addEventListener("dragleave",()=> dropArea.style.background="");
-dropArea.addEventListener("drop",(e)=> {
-  e.preventDefault(); dropArea.style.background="";
-  const file = e.dataTransfer.files[0];
-  uploadImage(file);
+/* Click upload */
+dropArea.addEventListener("click", ()=>{
+  document.getElementById("fileInput").click();
 });
 
+/* File picker upload */
+document.getElementById("fileInput").addEventListener("change", ()=>{
+  const files = document.getElementById("fileInput").files;
+  for(let i=0; i<files.length; i++){
+    uploadImage(files[i]);
+  }
+});
+
+/* Drag over */
+dropArea.addEventListener("dragover", (e)=>{
+  e.preventDefault();
+  e.stopPropagation();
+  dropArea.style.background="rgba(255,255,255,0.2)";
+});
+
+/* Drag leave */
+dropArea.addEventListener("dragleave", ()=>{
+  dropArea.style.background="";
+});
+
+/* Drop upload */
+dropArea.addEventListener("drop", (e)=>{
+  e.preventDefault();
+  e.stopPropagation();
+  dropArea.style.background="";
+
+  const files = e.dataTransfer.files;
+  if(files.length === 0) return;
+
+  for(let i=0; i<files.length; i++){
+    uploadImage(files[i]);
+  }
+});
+
+/* Upload image to Cloudinary */
 async function uploadImage(file){
-  if(!file) file = document.getElementById("fileInput").files[0];
-  if(!file){ alert("Select an image first"); return; }
+  if(!file){
+    alert("Select an image first");
+    return;
+  }
 
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", preset);
 
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,{
-    method:"POST",
-    body: formData
-  });
-  const data = await res.json();
-  if(data.secure_url) addImage(data.secure_url);
+  try {
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+    if(data.secure_url){
+      addImage(data.secure_url);
+    }
+  } catch(err){
+    console.error("Upload failed:", err);
+    alert("Upload failed. Check console.");
+  }
 }
 
-// Add image to gallery
+/* Add image to gallery */
 function addImage(url){
   const img = document.createElement("img");
   img.src = url;
-  img.onclick = ()=> openImage(url);
+  img.onclick = ()=>openImage(url);
   document.getElementById("gallery").appendChild(img);
 }
 
-// Popup
+/* Popup functions */
 function openImage(src){
   document.getElementById("popup").style.display="flex";
   document.getElementById("popupImg").src = src;
 }
-function closeImage(){ document.getElementById("popup").style.display="none"; }
+function closeImage(){
+  document.getElementById("popup").style.display="none";
+}
 </script>
 
 </body>
