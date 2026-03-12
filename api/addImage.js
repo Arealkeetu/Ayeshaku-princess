@@ -1,21 +1,27 @@
-import { readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import fs from 'fs';
+import path from 'path';
 
-export default function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+export default async function handler(req, res) {
+  if (req.method === 'POST') {
+    const { url } = req.body;
 
-  const { url } = req.body;
-  if (!url) return res.status(400).send('No URL provided');
+    if (!url) return res.status(400).json({ error: 'No URL provided' });
 
-  const filePath = join(process.cwd(), 'gallery.json');
-  let data = [];
+    const filePath = path.join(process.cwd(), 'gallery.json');
+    let gallery = [];
 
-  try {
-    data = JSON.parse(readFileSync(filePath, 'utf-8'));
-  } catch (err) {}
+    try {
+      const data = fs.readFileSync(filePath, 'utf8');
+      gallery = JSON.parse(data);
+    } catch (err) {
+      console.log('JSON read error:', err);
+    }
 
-  data.push(url);
-  writeFileSync(filePath, JSON.stringify(data, null, 2));
+    gallery.push(url);
+    fs.writeFileSync(filePath, JSON.stringify(gallery, null, 2));
 
-  res.status(200).json({ success: true });
+    return res.status(200).json({ message: 'Image added', gallery });
+  } else {
+    res.status(405).json({ error: 'Method not allowed' });
+  }
 }
