@@ -1,12 +1,16 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import fs from 'fs';
+import path from 'path';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
+  const filePath = path.join(process.cwd(), 'gallery.json');
+  let gallery = [];
+
   try {
-    const filePath = join(process.cwd(), 'gallery.json');
-    const data = JSON.parse(readFileSync(filePath, 'utf-8'));
-    res.status(200).json({ images: data });
+    const data = fs.readFileSync(filePath, 'utf8');
+    gallery = JSON.parse(data);
   } catch (err) {
-    res.status(200).json({ images: [] }); // empty gallery if no file yet
+    console.log('JSON read error:', err);
   }
+
+  res.status(200).json(gallery);
 }
