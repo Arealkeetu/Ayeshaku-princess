@@ -1,27 +1,23 @@
+// api/addImage.js
 import fs from 'fs';
 import path from 'path';
 
-export default async function handler(req, res) {
-  if (req.method === 'POST') {
+export default function handler(req, res){
+  const filePath = path.join(process.cwd(), 'gallery.json');
+
+  if(req.method === 'POST'){
     const { url } = req.body;
 
-    if (!url) return res.status(400).json({ error: 'No URL provided' });
-
-    const filePath = path.join(process.cwd(), 'gallery.json');
     let gallery = [];
-
-    try {
-      const data = fs.readFileSync(filePath, 'utf8');
-      gallery = JSON.parse(data);
-    } catch (err) {
-      console.log('JSON read error:', err);
+    if(fs.existsSync(filePath)){
+      gallery = JSON.parse(fs.readFileSync(filePath));
     }
 
     gallery.push(url);
-    fs.writeFileSync(filePath, JSON.stringify(gallery, null, 2));
+    fs.writeFileSync(filePath, JSON.stringify(gallery));
 
-    return res.status(200).json({ message: 'Image added', gallery });
+    res.status(200).json({message: 'Saved'});
   } else {
-    res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({message: 'Method not allowed'});
   }
 }
