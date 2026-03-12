@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Our Memories</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body{
+      margin:0;
+      font-family:'Poppins',sans-serif;
+      text-align:center;
+      background:linear-gradient(120deg,#ff758c,#ff7eb3);
+      color:white;
+    }
+
+    h1{
+      font-family:'Great Vibes',cursive;
+      font-size:60px;
+      margin-top:30px;
+    }
+
+    /* upload box */
+    .upload-box{
+      border:2px dashed white;
+      border-radius:20px;
+      padding:35px;
+      margin:30px auto;
+      width:80%;
+      max-width:500px;
+      cursor:pointer;
+      transition:0.3s;
+    }
+    .upload-box:hover{
+      background:rgba(255,255,255,0.1);
+    }
+    #fileInput{
+      display:none;
+    }
+
+    /* scrollable gallery container */
+    .gallery-container {
+      max-width: 900px;
+      height: 500px; /* fixed height */
+      margin: 20px auto;
+      padding: 15px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.1);
+      overflow-y: auto; /* vertical scroll */
+    }
+
+   /* fixed grid gallery */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 images per row for bigger display */
+  grid-auto-rows: 250px; /* taller rows = bigger images */
+  gap: 15px;
+}
+
+.gallery img{
+  width: 100%;
+  height: 100%;       /* fill the grid cell */
+  object-fit: cover;  /* crop to fit perfectly */
+  border-radius:15px;
+  cursor:pointer;
+  transition:transform 0.3s, box-shadow 0.3s;
+}
+
+    .gallery img:hover{
+      transform:scale(1.08);
+      box-shadow:0 10px 20px rgba(0,0,0,0.4);
+    }
+
+    /* popup */
+    #popup{
+      display:none;
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,0.8);
+      justify-content:center;
+      align-items:center;
+      z-index:999;
+    }
+
+    #popup img{
+      max-width:80%;
+      max-height:80%;
+      border-radius:20px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<h1>Our Memories 📸</h1>
+
+<label class="upload-box">
+  Drop Photo Here or Click to Upload
+  <input type="file" id="fileInput" accept="image/*">
+</label>
+
+<div class="gallery-container">
+  <div class="gallery" id="gallery"></div>
+</div>
+
+<!-- Popup Zoom -->
+<div id="popup" onclick="closeImage()">
+  <img id="popupImg">
+</div>
+
+<script>
+const cloudName = "dxyl0aoi0"; // your Cloudinary cloud name
+const preset = "gallery_upload"; // your unsigned upload preset
+const dropArea = document.querySelector(".upload-box");
+
+/* Click upload */
+dropArea.addEventListener("click", ()=>{
+  document.getElementById("fileInput").click();
+});
+
+/* File picker upload */
+document.getElementById("fileInput").addEventListener("change", ()=>{
+  uploadImage();
+});
+
+/* Drag over */
+dropArea.addEventListener("dragover",(e)=>{
+  e.preventDefault();
+  dropArea.style.background="rgba(255,255,255,0.2)";
+});
+
+/* Drag leave */
+dropArea.addEventListener("dragleave",()=>{
+  dropArea.style.background="";
+});
+
+/* Drop upload */
+dropArea.addEventListener("drop",(e)=>{
+  e.preventDefault();
+  dropArea.style.background="";
+  const file = e.dataTransfer.files[0];
+  uploadImage(file);
+});
+
+/* Upload image to Cloudinary */
+async function uploadImage(file){
+  if(!file){
+    file = document.getElementById("fileInput").files[0];
+  }
+  if(!file){
+    alert("Select an image first");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", preset);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,{
+    method:"POST",
+    body: formData
+  });
+
+  const data = await res.json();
+
+  if(data.secure_url){
+    addImage(data.secure_url);
+  }
+}
+
+/* Add image to gallery */
+function addImage(url){
+  const img = document.createElement("img");
+  img.src = url;
+  img.onclick = ()=>openImage(url);
+  document.getElementById("gallery").appendChild(img);
+}
+
+/* Popup functions */
+function openImage(src){
+  document.getElementById("popup").style.display="flex";
+  document.getElementById("popupImg").src = src;
+}
+function closeImage(){
+  document.getElementById("popup").style.display="none";
+}
+</script>
+
+</body>
+</html>
+
+

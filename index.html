@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Home - Our Memories</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    font-family:'Poppins', sans-serif;
+    text-align:center;
+    background:linear-gradient(120deg,#ff758c,#ff7eb3);
+    color:white;
+}
+
+/* Navbar with animated gradient */
+@keyframes gradientBG {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
+}
+
+.navbar{
+    background: linear-gradient(-45deg, #ff758c, #ff7eb3, #ffb6c1, #ff9abc);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    padding:15px;
+    position: sticky;
+    top:0;
+    z-index:1000;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.navbar a{
+    color:white;
+    margin:5px 10px;
+    padding:8px 12px;
+    text-decoration:none;
+    font-weight:600;
+    font-size:18px;
+    display:inline-block;
+    transition: background 0.3s, color 0.3s;
+    border-radius:8px;
+}
+
+.navbar a:hover{
+    background: rgba(255,255,255,0.2);
+    color:#fff;
+}
+
+/* Sections */
+.section{
+    max-width:900px;
+    margin:auto;
+    padding:30px 10px;
+    opacity:0;
+    transform: translateY(30px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.section.show{
+    opacity:1;
+    transform: translateY(0);
+}
+
+h1{
+    font-family:'Great Vibes', cursive;
+    font-size:3rem;
+    margin-top:40px;
+    margin-bottom:20px;
+}
+
+h2{
+    font-size:2rem;
+    margin-bottom:20px;
+}
+
+.counter{
+    font-size:1.5rem;
+    margin-bottom:20px;
+}
+
+.section img{
+    width:80%;
+    max-width:400px;
+    border-radius:15px;
+    margin-bottom:20px;
+    cursor:pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.section img:hover{
+    transform:scale(1.05);
+    box-shadow:0 10px 20px rgba(0,0,0,0.4);
+}
+
+/* Lightbox */
+#popup{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.8);
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+    opacity:0;
+    transition:opacity 0.5s;
+}
+#popup.show{
+    opacity:1;
+}
+#popup img{
+    max-width:80%;
+    max-height:80%;
+    border-radius:20px;
+}
+
+/* Mobile adjustments */
+@media screen and (max-width:480px){
+    h1{ font-size:2.2rem; }
+    h2{ font-size:1.5rem; }
+    .navbar a{ font-size:16px; padding:6px 8px; }
+    .counter{ font-size:1.2rem; }
+    .section img{ width:90%; }
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+<a href="index.html">Home</a>
+<a href="gallery.html">Gallery</a>
+<a href="letter.html">Love Letter</a>
+<a href="question.html">Question</a>
+</div>
+
+<!-- Sections -->
+
+<div class="section" id="dating">
+<h1>Our Dating Time ⏳</h1>
+<div class="counter" id="counter"></div>
+</div>
+
+<div class="section" id="firstpic">
+<h2>Our First Picture Together 📸</h2>
+<img src="firstpic.jpg" onclick="openImage(this.src)">
+</div>
+
+<div class="section" id="firstdate">
+<h2>First Date yg Goofy💖</h2>
+<img src="firstdate.jpg" onclick="openImage(this.src)">
+</div>
+
+<div class="section" id="favorite">
+<h2>My Favorite Pic of Ayesha 😍</h2>
+<img src="favorite.jpg" onclick="openImage(this.src)">
+</div>
+
+<!-- Lightbox -->
+<div id="popup" onclick="closeImage()">
+<img id="popupImg">
+</div>
+
+<script>
+// Dating counter
+const startDate = new Date("2026-01-12T00:00:00");
+function updateCounter(){
+    const now = new Date();
+    const diff = now - startDate;
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor(diff / (1000*60*60)) % 24;
+    const minutes = Math.floor(diff / (1000*60)) % 60;
+    const seconds = Math.floor(diff / 1000) % 60;
+    document.getElementById("counter").innerHTML = `${days} days ${hours}h ${minutes}m ${seconds}s`;
+}
+setInterval(updateCounter,1000);
+updateCounter();
+
+// Lightbox
+function openImage(src){
+    const popup = document.getElementById("popup");
+    popup.style.display="flex";
+    void popup.offsetWidth;
+    popup.classList.add("show");
+    document.getElementById("popupImg").src=src;
+}
+function closeImage(){
+    const popup = document.getElementById("popup");
+    popup.classList.remove("show");
+    setTimeout(()=>{ popup.style.display="none"; },500);
+}
+
+// Scroll fade-in
+const sections = document.querySelectorAll(".section");
+function revealSections(){
+    const triggerBottom = window.innerHeight / 1.2;
+    sections.forEach(section => {
+        const sectionTop = section.getBoundingClientRect().top;
+        if(sectionTop < triggerBottom){
+            section.classList.add("show");
+        }
+    });
+}
+window.addEventListener("scroll", revealSections);
+window.addEventListener("load", revealSections);
+</script>
+
+</body>
+</html>
