@@ -1,1 +1,43 @@
+async function loadGallery() {
 
+  try {
+
+    const response = await fetch("/api/loadGallery");
+    const data = await response.json();
+
+    const gallery = document.getElementById("gallery");
+
+    gallery.innerHTML = "";
+
+    data.images.forEach(url => {
+      const img = document.createElement("img");
+      img.src = url;
+
+      img.onclick = () => openImage(url);
+
+      gallery.appendChild(img);
+    });
+
+  } catch (error) {
+    console.error("Error loading gallery:", error);
+  }
+
+}
+
+window.onload = loadGallery;
+
+
+
+function openImage(src) {
+
+  const popup = document.getElementById("popup");
+  const popupImg = document.getElementById("popupImg");
+
+  popup.style.display = "flex";
+  popupImg.src = src;
+
+}
+
+function closeImage() {
+  document.getElementById("popup").style.display = "none";
+}
