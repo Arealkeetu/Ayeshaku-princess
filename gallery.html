@@ -251,29 +251,17 @@ document.getElementById("gallery").appendChild(img);
 
 async function loadGallery(){
 
-try{
+const res = await fetch("/api/loadGallery")
 
-const res=await fetch(`https://res.cloudinary.com/${cloudName}/image/list/${preset}.json`);
+const data = await res.json()
 
-const data=await res.json();
-
-data.resources.forEach(img=>{
-
-const url=`https://res.cloudinary.com/${cloudName}/image/upload/${img.public_id}.${img.format}`;
-
-addImage(url);
-
-});
-
-}catch(err){
-
-console.error("Gallery load failed:",err);
+data.images.forEach(url=>{
+addImage(url)
+})
 
 }
 
-}
-
-window.onload=loadGallery;
+window.onload = loadGallery
 
 /* POPUP */
 
@@ -295,3 +283,4 @@ document.getElementById("popup").style.display="none";
 
 </body>
 </html>
+
