@@ -1,28 +1,34 @@
-import fs from 'fs';
-import path from 'path';
+// /api/addImage.js
+import { v2 as cloudinary } from "cloudinary";
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
+  if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { url } = req.body;
-
-  if (!url) return res.status(400).json({ error: "No URL provided" });
-
-  const filePath = path.join(process.cwd(), 'gallery.json');
-
   try {
-    const fileData = fs.readFileSync(filePath, 'utf8');
-    const data = JSON.parse(fileData);
+    const { url, public_id } = req.body;
 
-    data.images.push(url);
+    if (!url || !public_id) {
+      return res.status(400).json({ error: "Missing url or public_id" });
+    }
 
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    // Optional: you can use Cloudinary API to add tags to image
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
 
-    res.status(200).json({ message: "Image added", url });
+    // Add a tag so your loadGallery can filter
+    await cloudinary.uploader.explicit(public_id, {
+      type: "upload",
+      tags: ["my-gallery"],
+    });
+
+    return res.status(200).json({ message: "Image added successfully" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to save image" });
+    console.error("Add image failed:", err);
+    return res.status(500).json({ error: "Failed to add image" });
   }
 }
