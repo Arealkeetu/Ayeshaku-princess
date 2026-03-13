@@ -191,7 +191,8 @@ async function uploadImage(file){
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", preset);
-  formData.append("folder", "gallery");   // ← add this line
+  formData.append("folder", "gallery");   
+  formData.append("tags", "my-gallery");   // ✅ add this line
 
   try {
     const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
@@ -245,6 +246,7 @@ window.onload = loadGallery;
 
 </body>
 </html>
+
 
 
 
