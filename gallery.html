@@ -224,10 +224,26 @@ function openImage(src){
 function closeImage(){
   document.getElementById("popup").style.display="none";
 }
+
+async function loadGallery(){
+
+  const res = await fetch("/api/loadGallery");
+  const data = await res.json();
+
+  if(data.images){
+    data.images.forEach(url=>{
+      addImage(url);
+    });
+  }
+
+}
+
+window.onload = loadGallery;
 </script>
 
 </body>
 </html>
+
 
 
 
