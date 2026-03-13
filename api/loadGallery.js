@@ -1,13 +1,13 @@
 export default async function handler(req, res) {
 
   const cloudName = "dxyl0aoi0";
-  const folder = "my-gallery";
 
-  const url = `https://res.cloudinary.com/${cloudName}/image/list/${folder}.json`;
+  try {
 
-  try{
+    const response = await fetch(
+      `https://res.cloudinary.com/${cloudName}/image/list/gallery.json`
+    );
 
-    const response = await fetch(url);
     const data = await response.json();
 
     const images = data.resources.map(img =>
@@ -16,8 +16,10 @@ export default async function handler(req, res) {
 
     res.status(200).json({images});
 
-  }catch(err){
-    res.status(500).json({error:"failed"});
+  } catch (err) {
+
+    res.status(500).json({error:"Failed to load gallery"});
+
   }
 
 }
