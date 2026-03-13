@@ -229,9 +229,8 @@ function closeImage(){
 
 async function loadGallery(){
 
-  const res = await fetch("https://raw.githubusercontent.com/Arealkeetu/Ayeshaku-princess/master/gallery.json");
-const data = await res.json();
-
+  const res = await fetch("/api/loadGallery");
+  const data = await res.json();
 
   if(data.images){
     data.images.forEach(url=>{
@@ -242,10 +241,14 @@ const data = await res.json();
 }
 
 window.onload = loadGallery;
+
+}
+
 </script>
 
 </body>
 </html>
+
 
 
 
