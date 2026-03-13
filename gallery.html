@@ -156,6 +156,9 @@
 </div>
 
 <script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
 const cloudName = "dxyl0aoi0";
 const preset = "my-gallery";
 const dropArea = document.getElementById("dropArea");
@@ -294,7 +297,9 @@ console.error("Error loading gallery:",err);
 
 }
 
-window.onload=loadGallery;
+loadGallery();
+
+});
 
 /* Popup */
 function openImage(src){
@@ -305,7 +310,9 @@ document.getElementById("popupImg").src=src;
 function closeImage(){
 document.getElementById("popup").style.display="none";
 }
+
 </script>
 
 </body>
 </html>
+
