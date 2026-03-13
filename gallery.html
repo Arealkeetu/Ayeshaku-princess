@@ -128,7 +128,7 @@ del.onclick=async(e)=>{
 
 e.stopPropagation();
 
-await fetch("/api/deleteImage",{
+await fetch("/api/delete",{
 method:"POST",
 headers:{'Content-Type':'application/json'},
 body:JSON.stringify({
@@ -183,3 +183,4 @@ document.getElementById("popup").style.display="none";
 }
 
 </script>
+
