@@ -228,8 +228,7 @@ function closeImage(){
 
 async function loadGallery(){
 
-  const res = await fetch("https://raw.githubusercontent.com/Arealkeetu/Ayeshaku-princess/refs/heads/master/gallery.json")
-;
+  const res = await fetch("https://raw.githubusercontent.com/Arealkeetu/Ayeshaku-princess/refs/heads/master/gallery.json");
   const data = await res.json();
 
   if(data.images){
@@ -245,6 +244,7 @@ window.onload = loadGallery;
 
 </body>
 </html>
+
 
 
 
