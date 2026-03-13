@@ -1,36 +1,29 @@
-import cloudinary from 'cloudinary';
-import fs from 'fs';
-import path from 'path';
+import { v2 as cloudinary } from "cloudinary"
 
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUD_API_KEY,
-  api_secret: process.env.CLOUD_API_SECRET,
-});
+cloudinary.config({
+cloud_name:process.env.CLOUD_NAME,
+api_key:process.env.CLOUD_API_KEY,
+api_secret:process.env.CLOUD_API_SECRET
+})
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).end();
+export default async function handler(req,res){
 
-  const { public_id, url } = req.body; // use public_id from Cloudinary
+if(req.method!=="POST"){
+return res.status(405).end()
+}
 
-  try {
-    // Delete from Cloudinary
-    if (public_id) {
-      await cloudinary.v2.uploader.destroy(public_id);
-    }
+const {public_id}=req.body
 
-    // Remove from gallery.json
-    const filePath = path.join(process.cwd(), "gallery.json");
-    let data = { images: [] };
-    if (fs.existsSync(filePath)) {
-      data = JSON.parse(fs.readFileSync(filePath, "utf8"));
-    }
-    data.images = data.images.filter(img => img !== url);
-    fs.writeFileSync(filePath, JSON.stringify(data));
+try{
 
-    res.status(200).json({ message: "Deleted" });
-  } catch (err) {
-    console.error("Delete failed:", err);
-    res.status(500).json({ error: "Failed to delete image" });
-  }
+await cloudinary.uploader.destroy(public_id)
+
+res.status(200).json({success:true})
+
+}catch(err){
+
+res.status(500).json({error:"Delete failed"})
+
+}
+
 }
