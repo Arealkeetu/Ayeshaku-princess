@@ -247,7 +247,7 @@ img.src=url;
 
 img.onclick=()=>openImage(url);
 
-document.getElementById("gallery").appendChild(img);
+document.getElementById("gallery").insertBefore(img, document.getElementById("gallery").firstChild);
 
 }
 
@@ -287,6 +287,7 @@ document.getElementById("popup").style.display="none";
 
 </body>
 </html>
+
 
 
 
