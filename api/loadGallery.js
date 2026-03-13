@@ -5,7 +5,9 @@ export default async function handler(req, res) {
   try {
 
     const response = await fetch(
-      `https://res.cloudinary.com/${cloudName}/image/list/gallery.json`
+  `https://res.cloudinary.com/${cloudName}/image/list/my-gallery.json`
+);
+
     );
 
     const data = await response.json();
@@ -23,3 +25,4 @@ export default async function handler(req, res) {
   }
 
 }
+
